@@ -1,0 +1,44 @@
+# Gemini設定
+gemini:
+  api_key: ""
+  model: "gemini-3.1-pro-preview"
+
+# キャプチャ設定
+capture:
+  # ShareXが固定ファイル名で書き出す画像のフルパス
+  source_path: "C:/hinaft/captures/zwift.png"
+  # rename後の作業フォルダ
+  processing_dir: "C:/hinaft/captures/processing"
+  # rename失敗時のリトライ間隔（秒）と上限回数
+  rename_retry_interval: 2
+  rename_retry_max: 5
+
+# 画像加工設定（Zwift画面のクリップ）
+image:
+  # クリップ座標（左上 x1, y1 / 右下 x2, y2）
+  clip:
+    x1: 0
+    y1: 0
+    x2: 1920
+    y2: 1080
+  # リサイズ後の横幅（px）。縦は成り行き
+  resize_width: 768
+
+# 会話履歴
+history:
+  # Gemini呼び出し時に取得する直近の件数
+  recent_count: 30
+
+# メインループ
+loop:
+  # キャプチャ存在チェックの待機間隔（秒）
+  interval_seconds: 10
+
+# DB
+database:
+  path: "C:/hinaft/backend/data.db"
+
+# プロンプトファイル
+prompts:
+  character_path: "C:/hinaft/backend/prompts/character.md"
+  cheer_path: "C:/hinaft/backend/prompts/cheer.md"
