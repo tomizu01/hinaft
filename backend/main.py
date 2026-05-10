@@ -222,7 +222,6 @@ async def main_loop(app: FastAPI) -> None:
     history_count = cfg["history"]["recent_count"]
     clip = cfg["image"]["clip"]
     resize_width = cfg["image"]["resize_width"]
-    model = cfg["gemini"]["model"]
 
     character_prompt = read_prompt(cfg["prompts"]["character_path"])
     cheer_prompt = read_prompt(cfg["prompts"]["cheer_path"])
@@ -266,6 +265,8 @@ async def main_loop(app: FastAPI) -> None:
             )
             history_text = history_to_text(history_rows)
 
+            tier = app.state.model_tier
+            model = app.state.model_names[tier]
             try:
                 message = await asyncio.to_thread(
                     call_gemini,
@@ -277,7 +278,7 @@ async def main_loop(app: FastAPI) -> None:
                     processed,
                 )
             except Exception:
-                logger.exception("Gemini呼び出し失敗")
+                logger.exception("Gemini呼び出し失敗 (tier=%s, model=%s)", tier, model)
                 await asyncio.sleep(interval)
                 continue
 
@@ -287,7 +288,7 @@ async def main_loop(app: FastAPI) -> None:
                 continue
 
             await asyncio.to_thread(insert_message, db_path, "ai", message, 0)
-            logger.info("AI発話を保存: %s", message[:40])
+            logger.info("AI発話を保存 (tier=%s): %s", tier, message[:40])
 
         except asyncio.CancelledError:
             logger.info("メインループ停止")
@@ -298,12 +299,30 @@ async def main_loop(app: FastAPI) -> None:
         await wait_for_new_player_message(db_path, interval * 3, 5)
 
 
+VALID_TIERS = ("flash", "pro")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     cfg = load_config()
     app.state.config = cfg
     init_db(cfg["database"]["path"])
     app.state.gemini_client = build_gemini_client(cfg["gemini"]["api_key"])
+    app.state.model_names = {
+        "flash": cfg["gemini"]["flash_model"],
+        "pro": cfg["gemini"]["pro_model"],
+    }
+    default_tier = cfg["gemini"].get("default_tier", "flash")
+    if default_tier not in VALID_TIERS:
+        logger.warning("default_tier=%s が不正なので flash に補正", default_tier)
+        default_tier = "flash"
+    app.state.model_tier = default_tier
+    logger.info(
+        "Geminiモデル初期化: tier=%s flash=%s pro=%s",
+        default_tier,
+        app.state.model_names["flash"],
+        app.state.model_names["pro"],
+    )
     Path(cfg["capture"]["processing_dir"]).mkdir(parents=True, exist_ok=True)
 
     task = asyncio.create_task(main_loop(app))
@@ -324,6 +343,10 @@ class PlayerMessage(BaseModel):
     content: str
 
 
+class ModelTierUpdate(BaseModel):
+    tier: str
+
+
 @app.get("/api/messages/next")
 async def get_next_message():
     cfg = app.state.config
@@ -336,6 +359,24 @@ async def get_next_message():
         "content": row["content"],
         "created_at": row["created_at"],
     }
+
+
+@app.get("/api/model")
+async def get_model():
+    return {
+        "tier": app.state.model_tier,
+        "models": app.state.model_names,
+    }
+
+
+@app.post("/api/model")
+async def set_model(payload: ModelTierUpdate):
+    tier = payload.tier
+    if tier not in VALID_TIERS:
+        raise HTTPException(status_code=400, detail=f"tier must be one of {VALID_TIERS}")
+    app.state.model_tier = tier
+    logger.info("モデル切替: tier=%s model=%s", tier, app.state.model_names[tier])
+    return {"tier": tier, "model": app.state.model_names[tier]}
 
 
 @app.post("/api/messages/player")

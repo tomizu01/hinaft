@@ -6,6 +6,7 @@
   const playerInput = document.getElementById("player-input");
   const micBtn = document.getElementById("mic-btn");
   const autoBtn = document.getElementById("auto-btn");
+  const modelBtn = document.getElementById("model-btn");
   const statusEl = document.getElementById("status-text");
   const lastPlayerEl = document.getElementById("last-player");
   const characterImg = document.getElementById("character-img");
@@ -211,6 +212,47 @@
     autoBtn.setAttribute("aria-pressed", String(autoMicEnabled));
     autoBtn.textContent = `AUTO: ${autoMicEnabled ? "ON" : "OFF"}`;
   });
+
+  function applyModelTier(tier) {
+    modelBtn.dataset.tier = tier;
+    modelBtn.textContent = `モデル: ${tier.toUpperCase()}`;
+    modelBtn.setAttribute("aria-pressed", String(tier === "pro"));
+  }
+
+  async function fetchModelTier() {
+    try {
+      const res = await fetch("/api/model");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && data.tier) applyModelTier(data.tier);
+    } catch (e) {
+      console.warn("モデル状態取得失敗", e);
+    }
+  }
+
+  async function setModelTier(tier) {
+    const prev = modelBtn.dataset.tier;
+    applyModelTier(tier);
+    try {
+      const res = await fetch("/api/model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier }),
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+    } catch (e) {
+      console.error("モデル切替失敗", e);
+      setStatus("モデル切替失敗");
+      applyModelTier(prev);
+    }
+  }
+
+  modelBtn.addEventListener("click", () => {
+    const next = modelBtn.dataset.tier === "flash" ? "pro" : "flash";
+    setModelTier(next);
+  });
+
+  fetchModelTier();
 
   playerForm.addEventListener("submit", async (e) => {
     e.preventDefault();

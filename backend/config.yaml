@@ -1,7 +1,10 @@
 # Gemini設定
 gemini:
-  api_key: ""
-  model: "gemini-3.1-pro-preview"
+  api_key: "** gemini api key **"
+  flash_model: "gemini-3-flash-preview"
+  pro_model: "gemini-3.1-pro-preview"
+  # 起動直後のモデル ("flash" or "pro")
+  default_tier: "flash"
 
 # キャプチャ設定
 capture:
