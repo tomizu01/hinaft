@@ -32,12 +32,16 @@ Eleven Labs API Keyを取得する
 - frontend\images
   画像の差し替えをしたい場合はstand.png,talk.pngを差し替える（APNG推奨）
 
-setup.batを実行
+Windows Power Shellを起動し、ソースを展開したディレクトリに移動して初期設定スクリプトを実行する
+  - .\setup.ps1
+  スクリプトが実行できない場合は下記コマンドを実行する
+  - Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 スクリーンキャプチャーソフトを起動
 - config.yamlで指定した画像パスにバックグラウンドで一定時間おきに自動画像保存（上書き）する設定で実行しておく
 
 pythonを実行
+- .\backend\venv\Scripts\Activate.ps1
 - python backend\main.py
 
 ブラウザでアクセス
