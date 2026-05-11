@@ -1,60 +1,63 @@
-# �K�v���E�\�t�g
+# 必要環境・ソフト
 
 Windows11 64bit
 Zwift
-��ʎ����L���v�`���\�t�g�i�Œ�t�@�C�����Ŏ����ۑ����Ă������́j
-Chrome Desktop�u���E�U
-�}�C�N�E�w�b�h�z������
-python3�i�o�[�W������3.13�����j
+画面自動キャプチャソフト（固定ファイル名で自動保存してくれるもの）
+Chrome Desktopブラウザ
+マイク・ヘッドホン推奨
+python3（バージョンは3.13推奨）
 
-# ���O����
+# 事前準備
 
-Gemini API Key���擾����
-Eleven Labs API Key���擾����
+Gemini API Keyを取得する
+Eleven Labs API Keyを取得する
 
-# Setup�菇
+# Setup手順
 
-�K�v�\�t�g���C���X�g�[������
+必要ソフトをインストールする
 - python 3.13
 - Chrome Desktop
-- ��ʎ����L���v�`���\�t�g
+- 画面自動キャプチャソフト
 
-�\�[�X��W�J����
+ソースを展開する
 
-���L�ݒ�t�@�C��������������
+下記設定ファイルを書き換える
 - backend\config.yaml
-  Gemini API Key�̖��ߍ���
-  �L���v�`���\�t�g�������o���摜�̃p�X�E�t�@�C�����̐ݒ�
-�@�e��p�X�̏�������
-  �L���v�`�������摜����Zwift��ʂ�؂�o���͈͂̐ݒ�
+  Gemini API Keyの埋め込み
+  キャプチャソフトが書き出す画像のパス・ファイル名の設定
+　各種パスの書き換え
+  キャプチャした画像からZwift画面を切り出す範囲の設定
 - frontend\config.js
-  ElevenLabs��API�L�[�̖��ߍ���
+  ElevenLabsのAPIキーの埋め込み
 - frontend\images
-  �摜�̍����ւ����������ꍇ��stand.png,talk.png�������ւ���iAPNG�����j
+  画像の差し替えをしたい場合はstand.png,talk.pngを差し替える（APNG推奨）
 
-setup.bat�����s
+setup.batを実行
 
-python�����s
+スクリーンキャプチャーソフトを起動
+- config.yamlで指定した画像パスにバックグラウンドで一定時間おきに自動画像保存（上書き）する設定で実行しておく
+
+pythonを実行
 - python backend\main.py
 
-�u���E�U�ŃA�N�Z�X
+ブラウザでアクセス
 - http://localhost:8000
 
 
-�����̃\�t�g�E�F�A�́A����ւ̌l���p�����ɐ݌v����Ă��邽�߁A
-�@��΂ɊO�������̃T�[�o�Ō��J���Ȃ��ł��������Blocalhost�ł̂�
-�@���s���Ă��������BAPI�L�[�̈ꕔ�̓u���E�U�Ƃ̒ʐM�Ɋ܂܂�A
-�@API�L�[�̕s�����p���������ꂪ����܂��B
+※このソフトウェアは、自宅への個人利用向けに設計されているため、
+　絶対に外部向けのサーバで公開しないでください。localhostでのみ
+　実行してください。APIキーの一部はブラウザとの通信に含まれ、
+　APIキーの不正利用を招く恐れがあります。
 
 
-# ���ӎ���
+# 注意事項
 
-��Hinaft�͌l�J���ɂ�������c�[���ł��B
-�����p�͎��ȐӔC�ł��肢�������܂��B
+※Hinaftは個人開発による非公式ツールです。
+ご利用は自己責任でお願いいたします。
 
-�{�V�X�e���̗��p�ɂ�蔭���������ɂ��āA�J���҂͐ӔC�𕉂��܂���B
-�܂��AZwift Inc.�Ƃ͈�؊֌W����܂���B
-�s��⎿��ɂ��āAZwift Inc.�ւ̂��₢���킹�͍s��Ȃ��悤���肢�������܂��B
+本システムの利用により発生した問題について、開発者は責任を負いません。
+また、Zwift Inc.とは一切関係ありません。
+不具合や質問について、Zwift Inc.へのお問い合わせは行わないようお願いいたします。
 
 Hinaft is an unofficial personal project.
 Use at your own risk.
